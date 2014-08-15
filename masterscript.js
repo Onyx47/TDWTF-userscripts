@@ -9,23 +9,27 @@
 // Globals
 userScripts = {
 	raw: {
-		active: 	'false',
+		active: 		'false',
 		functionName: 	'appendRawButton'
 	},
 	userstats: {
-		active:		'false',
+		active:			'false',
 		functionName:	'appendUserStats'
+	}
+	removeheatmap: {
+		active:			'false',
+		functionName:	'removePostCountHeatmap'
 	}
 };
 
-// Utility function
+// Utility functions
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
     for(var i=0; i<ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+		while (c.charAt(0)==' ') { c = c.substring(1); }
+		if (c.indexOf(name) != -1) { return c.substring(name.length,c.length); }
     }
     return "";
 }
@@ -48,9 +52,9 @@ function getRawPost(e)
 		//Prettify
 		callingButton.css({backgroundColor: '#08C', color: '#FFF'});
 
-		if (postArea.children('.tdwtf-raw-area') .length == 0 || postArea.children('.tdwtf-raw-area') .html() == '') {
+		if (postArea.children('.tdwtf-raw-area') .length === 0 || postArea.children('.tdwtf-raw-area') .html() === '') {
 			$.get('/raw/' + topicID + '/' + postID) .done(function (content) {
-				if (postArea.children('.tdwtf-raw-area') .length == 0)
+				if (postArea.children('.tdwtf-raw-area') .length === 0)
 				{
 					postArea.children('.cooked') .after('<pre class="tdwtf-raw-area"></pre>');
 					postArea.children('.cooked') .hide();
@@ -74,7 +78,7 @@ function getRawPost(e)
 
 // Appends the "Show raw" button
 function appendRawButton(postData) {
-	if(userScriptStatus.raw.active == 'true') {
+	if(userScripts.raw.active == 'true') {
 		// This thing triggers for any render, so we check if a post has been rendered
 		if (postData.post) {
 			// Get post ID
@@ -85,7 +89,7 @@ function appendRawButton(postData) {
 			var actionArea = $('button[data-post-number="' + postID + '"][data-action="share"]') .parent('.actions');
 			var postArea = actionArea.parents('div.contents') .children('.cooked') [0];
 			// This triggers for every render, so we check for existence of the button
-			if (actionArea.children('.tdwtf-view-raw') .length == 0) {
+			if (actionArea.children('.tdwtf-view-raw') .length === 0) {
 				// Add the button!
 				actionArea.prepend('<button title="view raw post" class="tdwtf-view-raw" data-post-id="' + postID + '"><i class="fa fa-code"></i>&nbsp;#' + topicID + ':' + postID + '</button>') .children('.tdwtf-view-raw') .on('click', {
 					topicID: topicID,
@@ -98,7 +102,7 @@ function appendRawButton(postData) {
 
 // Appends the user statistics
 function appendUserStats(postData) {	
-	if(userScriptStatus.userstats.active == 'true')
+	if(userScripts.userstats.active == 'true')
 	{
 		// This thing triggers for any render, so we check if a post has been rendered
 		if (postData.post) {
@@ -128,7 +132,7 @@ function appendUserStats(postData) {
 			// Find avatar area for the post
 			var avatarArea = $('article[id="post_' + postID + '"]') .children('.row') .children('.topic-avatar');
 			// Check if the container has already been appended
-			if (avatarArea.children('.tdwtf-user-stats') .length == 0) {
+			if (avatarArea.children('.tdwtf-user-stats') .length === 0) {
 				// Append stats elements
 				avatarArea.append('<span class="tdwtf-user-stats" data-username="' + username + '" style="font: normal normal 400 10px Arial; color: #A7A7A7;"><i class="fa fa-envelope"></i>&nbsp;<span class="tdwtf-post-count" data-username="' + username + '">' + postCount + '</span><br><i class="fa fa-certificate"></i>&nbsp;<span class="tdwtf-badge-count" data-username="' + username + '">' + badgeCount + '</span>');
 			}
@@ -136,9 +140,14 @@ function appendUserStats(postData) {
 	}
 }
 
+// Removes the heatmap from post count in topic list
+function removePostCountHeatmap() {
+	$('td.num.posts').attr('class', 'num posts');
+}
+
 // Appends the TDWTF script menu
 function appendManagementMenu() {
-	if($('.tdwtf-manager-menu').length == 0) {
+	if($('.tdwtf-manager-menu').length === 0) {
 		$('	<li class="tdwtf-manager-menu"></li>').insertBefore('li.notifications');
 		$('div.panel.clearfix').append(menu);
 
@@ -146,11 +155,11 @@ function appendManagementMenu() {
 			var targetScript = $(this).data('userscript');
 			var scriptOn = getCookie(targetScript);
 
-			if(scriptOn == '') scriptOn = 'false';
+			if(scriptOn === '') { scriptOn = 'false'; }
 			//userScriptStatus[targetScript] = scriptOn;
-			userScriptStatus[targetScript.active] = scriptOn;
+			userScripts[targetScript].active = scriptOn;
 
-			if(scriptOn == 'false') {
+			if(scriptOn === 'false') {
 				$(this).find('i').removeClass('fa-check-circle').addClass('fa-circle');
 			}
 		});
@@ -168,23 +177,21 @@ function appendManagementMenu() {
 			e.preventDefault();
 
 			var menuItem = $(this).find('.fa');
+			var targetScript = menuItem.closest('a').data('userscript');
 
 			menuItem.toggleClass('fa-circle').toggleClass('fa-check-circle');
 
 			if(menuItem.hasClass('fa-check-circle')) {
-				var targetScript = menuItem.closest('a').data('userscript');
+				
 				document.cookie = targetScript + "=true";
-				//userScriptStatus[targetScript] = 'true';
-				userScriptStatus[targetScript.active] = 'true';
+				userScripts[targetScript].active = 'true';
 			}
 			else
 			{
-				var targetScript = menuItem.closest('a').data('userscript');
 				document.cookie = targetScript + "=false";
-				// userScriptStatus[targetScript] = 'false';
-				userScriptStatus[targetScript.active] = 'false';
+				userScripts[targetScript].active = 'false';
 			}
-		})
+		});
 	}
 
 	$('body').on('click', function(e) 
@@ -211,6 +218,11 @@ menu = '<section class="d-dropdown" id="tdwtf-manager-dropdown" style="display: 
 					<p style="margin: 0;"><i class="fa fa-check-circle"></i> Show userstats </p>\
 				</a>\
 			</li>\
+			<li>\
+				<a href="#" data-userscript="removeheatmap" class="tdwtf-manager-toggle">\
+					<p style="margin: 0;"><i class="fa fa-check-circle"></i> Remove heatmap from post count </p>\
+				</a>\
+			</li>\
 		</ul>\
 	</section>';
 
@@ -221,13 +233,16 @@ Ember.View.reopen({
         Ember.run.scheduleOnce('afterRender', this, this.insertManagementMenu);
 		Ember.run.scheduleOnce('afterRender', this, this.insertRawButton);
 		Ember.run.scheduleOnce('afterRender', this, this.insertUserStats);
+		Ember.run.scheduleOnce('afterRender', this, this.removePostHeatmap);
     },
     insertManagementMenu: function () { appendManagementMenu(); },
 	insertRawButton: function () {},
-	insertUserStats: function () {}
+	insertUserStats: function () {},
+	removePostHeatmap: function() {}
 });
 
 Discourse.View.reopen({
-    insertRawButton: function () { appendRawButton(this) },
-	insertUserStats: function () { appendUserStats(this) }
+    insertRawButton: function () { appendRawButton(this); },
+	insertUserStats: function () { appendUserStats(this); },
+	removePostHeatmap: function () { removePostCountHeatmap(); }
 });
