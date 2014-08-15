@@ -7,7 +7,16 @@
 // ==/UserScript==
 
 // Globals
-userScriptStatus = [];
+userScripts = {
+	raw: {
+		active: 	'false',
+		functionName: 	'appendRawButton'
+	},
+	userstats: {
+		active:		'false',
+		functionName:	'appendUserStats'
+	}
+};
 
 // Utility function
 function getCookie(cname) {
@@ -65,7 +74,7 @@ function getRawPost(e)
 
 // Appends the "Show raw" button
 function appendRawButton(postData) {
-	if(userScriptStatus['raw'] == 'true') {
+	if(userScriptStatus.raw.active == 'true') {
 		// This thing triggers for any render, so we check if a post has been rendered
 		if (postData.post) {
 			// Get post ID
@@ -89,7 +98,7 @@ function appendRawButton(postData) {
 
 // Appends the user statistics
 function appendUserStats(postData) {	
-	if(userScriptStatus['userstats'] == 'true')
+	if(userScriptStatus.userstats.active == 'true')
 	{
 		// This thing triggers for any render, so we check if a post has been rendered
 		if (postData.post) {
@@ -138,7 +147,8 @@ function appendManagementMenu() {
 			var scriptOn = getCookie(targetScript);
 
 			if(scriptOn == '') scriptOn = 'false';
-			userScriptStatus[targetScript] = scriptOn;
+			//userScriptStatus[targetScript] = scriptOn;
+			userScriptStatus[targetScript.active] = scriptOn;
 
 			if(scriptOn == 'false') {
 				$(this).find('i').removeClass('fa-check-circle').addClass('fa-circle');
@@ -164,13 +174,15 @@ function appendManagementMenu() {
 			if(menuItem.hasClass('fa-check-circle')) {
 				var targetScript = menuItem.closest('a').data('userscript');
 				document.cookie = targetScript + "=true";
-				userScriptStatus[targetScript] = 'true';
+				//userScriptStatus[targetScript] = 'true';
+				userScriptStatus[targetScript.active] = 'true';
 			}
 			else
 			{
 				var targetScript = menuItem.closest('a').data('userscript');
 				document.cookie = targetScript + "=false";
-				userScriptStatus[targetScript] = 'false';
+				// userScriptStatus[targetScript] = 'false';
+				userScriptStatus[targetScript.active] = 'false';
 			}
 		})
 	}
