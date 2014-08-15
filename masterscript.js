@@ -21,19 +21,19 @@ userScriptStatus = [];
 
 // Templates
 menu = '<section class="d-dropdown" id="tdwtf-manager-dropdown" style="display: none;">\
-      			<ul>\
-					<li>\
-						<a href="#" data-userscript="raw" class="tdwtf-manager-toggle">\
-							<p style="margin: 0;"><i class="fa fa-check-circle"></i> Show raw </p>\
-						</a>\
-					</li>\
-					<li>\
-						<a href="#" data-userscript="userstats" class="tdwtf-manager-toggle">\
-							<p style="margin: 0;"><i class="fa fa-check-circle"></i> Show userstats </p>\
-						</a>\
-					</li>\
-        		</ul>\
-			</section>';
+      		<ul>\
+			<li>\
+				<a href="#" data-userscript="raw" class="tdwtf-manager-toggle">\
+					<p style="margin: 0;"><i class="fa fa-check-circle"></i> Show raw </p>\
+				</a>\
+			</li>\
+			<li>\
+				<a href="#" data-userscript="userstats" class="tdwtf-manager-toggle">\
+					<p style="margin: 0;"><i class="fa fa-check-circle"></i> Show userstats </p>\
+				</a>\
+			</li>\
+        	</ul>\
+	</section>';
 
 function tdwtfShowMenu(e) {
 	e.preventDefault();
@@ -110,7 +110,8 @@ Ember.View.reopen({
 				}
 			});
 			
-			$('.tdwtf-manager-menu').append('<a class="icon tdwtf-manager-menuicon" href="#" title="TDWTF userscripts manager">\
+			$('.tdwtf-manager-menu').append(
+					'<a class="icon tdwtf-manager-menuicon" href="#" title="TDWTF userscripts manager">\
 						<i class="fa fa-cogs tdwtf-manager-icon"></i>\
 					</a>').on('click', function(e)
 					{
@@ -156,8 +157,6 @@ Ember.View.reopen({
 
 Discourse.View.reopen({
     insertRawButton: function () {
-		//var rawCookie = getCookie('raw');
-		
 		if(userScriptStatus['raw'] == 'true') {
 			// This thing triggers for any render, so we check if a post has been rendered
 			if (this.post) {
@@ -179,9 +178,7 @@ Discourse.View.reopen({
 			}
 		}
     },
-	insertUserStats: function () {
-		//var statsCookie = getCookie('userstats');
-		
+	insertUserStats: function () {	
 		if(userScriptStatus['userstats'] == 'true')
 		{
 			// This thing triggers for any render, so we check if a post has been rendered
