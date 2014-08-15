@@ -11,11 +11,13 @@ function getCookie(cname) {
     var ca = document.cookie.split(';');
     for(var i=0; i<ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
+        while (c.charAt(0)==' ') { c = c.substring(1) };
         if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
     }
     return "";
 }
+
+userScriptStatus = [];
 
 // Templates
 menu = '<section class="d-dropdown" id="tdwtf-manager-dropdown" style="display: none;">\
@@ -100,6 +102,9 @@ Ember.View.reopen({
 				var targetScript = $(this).data('userscript');
 				var scriptOn = getCookie(targetScript);
 				
+				if(scriptOn == '') scriptOn = 'false';
+				userScriptStatus[targetScript] = scriptOn;
+				
 				if(scriptOn == 'false') {
 					$(this).find('i').removeClass('fa-check-circle').addClass('fa-circle');
 				}
@@ -124,11 +129,13 @@ Ember.View.reopen({
 				if(menuItem.hasClass('fa-check-circle')) {
 					var targetScript = menuItem.closest('a').data('userscript');
 					document.cookie = targetScript + "=true";
+					userScriptStatus[targetScript] = 'true';
 				}
 				else
 				{
 					var targetScript = menuItem.closest('a').data('userscript');
 					document.cookie = targetScript + "=false";
+					userScriptStatus[targetScript] = 'false';
 				}
 			})
 		}
@@ -149,9 +156,9 @@ Ember.View.reopen({
 
 Discourse.View.reopen({
     insertRawButton: function () {
-		var rawCookie = getCookie('raw');
+		//var rawCookie = getCookie('raw');
 		
-		if(rawCookie == 'true') {
+		if(userScriptStatus['raw'] == 'true') {
 			// This thing triggers for any render, so we check if a post has been rendered
 			if (this.post) {
 				// Get post ID
@@ -173,9 +180,9 @@ Discourse.View.reopen({
 		}
     },
 	insertUserStats: function () {
-		var statsCookie = getCookie('userstats');
+		//var statsCookie = getCookie('userstats');
 		
-		if(statsCookie == 'true')
+		if(userScriptStatus['userstats'] == 'true')
 		{
 			// This thing triggers for any render, so we check if a post has been rendered
 			if (this.post) {
