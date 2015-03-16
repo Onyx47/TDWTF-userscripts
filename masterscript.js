@@ -15,7 +15,7 @@ userScripts = {
 	userstats: {
 		active:			'false',
 		functionName:	'appendUserStats'
-	}
+	},
 	removeheatmap: {
 		active:			'false',
 		functionName:	'removePostCountHeatmap'
